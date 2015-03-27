@@ -1,9 +1,8 @@
-import urllib
-import urllib2
+import requests
 import json as j
 import sys
 
-__version__ = 0.242
+__version__ = 0.3
 
 
 def query(query, useragent='python-duckduckgo '+str(__version__), safesearch=True, html=False, meanings=True, **kwargs):
@@ -40,14 +39,10 @@ def query(query, useragent='python-duckduckgo '+str(__version__), safesearch=Tru
         'd': meanings,
         }
     params.update(kwargs)
-    encparams = urllib.urlencode(params)
-    url = 'http://api.duckduckgo.com/?' + encparams
-
-    request = urllib2.Request(url, headers={'User-Agent': useragent})
-    response = urllib2.urlopen(request)
-    json = j.loads(response.read())
-    response.close()
-
+    url = 'http://api.duckduckgo.com/'
+    request = requests.Request("GET", url, params=params, headers={'User-Agent': useragent}).prepare()
+    json = j.loads(requests.Session().send(request).text)
+    
     return Results(json)
 
 
